@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
 /**
  * Created by liKun on 2018/1/4 0004.
  */
-public class PromoteServer {
+public class PromoteServer{
+    ChatType chatType=ChatType.getChatType();
     Socket socket;
     //存储所有用户的输出流
     Map<String,PrintWriter> pws=new HashMap<>();
@@ -34,7 +35,7 @@ public class PromoteServer {
             System.out.println("服务器成功启动，等待链接......");
             while(true){
                 socket=server.accept();
-                handlerMsg();
+                handlerClient();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,18 +50,39 @@ public class PromoteServer {
         }
     }
 
-    public void handlerMsg(){
+    public void handlerClient(){
         try {
             BufferedReader br=new BufferedReader(new InputStreamReader(socket.getInputStream(),"utf-8"));
             PrintWriter pw=new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),"utf-8"),true);
             pw.println("成功链接到服务器");
-            Handler handler=new Handler(br,pw);
-            executorService.execute(handler);
+            String msg=br.readLine();
+            if(msg!=null){
+                String[] arr=msg.split(":");
+                if(arr.length>0){
+                    String typeIdentifier=msg.split(":")[0];
+                    if(typeIdentifier.equals(chatType.getLOGIN_NAME())){
+                        Handler handler=new Handler(br,pw);
+                        executorService.execute(handler);
+                    }else if(typeIdentifier.equals(chatType.getLOGIN_PASSWORD())){
+
+                    }else if(typeIdentifier.equals(chatType.getLOGIN_SUCCESS())){
+
+                    }else if(typeIdentifier.equals(chatType.getPRIVARE_CHAT())){
+
+                    }else if(typeIdentifier.equals(chatType.getPUBLIC_CHAT())){
+
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
+    public void handlerLogin(String msg){
+        String[] contents=msg.split(":");
+    }
+
 
 
     public class Handler implements Runnable{
