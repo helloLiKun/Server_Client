@@ -84,8 +84,8 @@ public class PromoteServer {
                             if(strs[0].equals("%username%")){
                                 name=strs[1];
                                 for(Map.Entry<String,PrintWriter> entry:pws.entrySet()){
-                                    if(entry.getKey().equals(name)){
                                         pw.println("%name%is%exit%");
+                                        if(entry.getKey().equals(name)){
                                         return;
                                     }
                                 }
