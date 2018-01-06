@@ -15,7 +15,7 @@ public class PromoteServer{
     ChatType chatType=ChatType.getChatType();
     Socket socket;
     //存储所有用户的输出流
-    Map<String,PrintWriter> pws=new HashMap<>();
+    Map<String,PrintWriter> users=new HashMap<>();
     //支持100并发的线程池
     ExecutorService executorService= Executors.newFixedThreadPool(100);
 
@@ -35,7 +35,8 @@ public class PromoteServer{
             System.out.println("服务器成功启动，等待链接......");
             while(true){
                 socket=server.accept();
-                handlerClient();
+                ClientHandler clientHandler=new ClientHandler(socket);
+                executorService.execute(clientHandler);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,80 +51,86 @@ public class PromoteServer{
         }
     }
 
-    public void handlerClient(){
-        try {
-            BufferedReader br=new BufferedReader(new InputStreamReader(socket.getInputStream(),"utf-8"));
-            PrintWriter pw=new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),"utf-8"),true);
-            pw.println("成功链接到服务器");
-            String msg=br.readLine();
-            if(msg!=null){
-                String[] arr=msg.split(":");
-                if(arr.length>0){
-                    String typeIdentifier=msg.split(":")[0];
-                    if(typeIdentifier.equals(chatType.getLOGIN_NAME())){
-                        Handler handler=new Handler(br,pw);
-                        executorService.execute(handler);
-                    }else if(typeIdentifier.equals(chatType.getLOGIN_PASSWORD())){
 
-                    }else if(typeIdentifier.equals(chatType.getLOGIN_SUCCESS())){
 
-                    }else if(typeIdentifier.equals(chatType.getPRIVARE_CHAT())){
+    public  class ClientHandler extends PublicParent implements Runnable{
 
-                    }else if(typeIdentifier.equals(chatType.getPUBLIC_CHAT())){
-
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        public ClientHandler(Socket socket) {
+            super(socket);
         }
-    }
 
-    public void handlerLogin(String msg){
-        String[] contents=msg.split(":");
-    }
-
-
-
-    public class Handler implements Runnable{
-        private BufferedReader br;
-        private PrintWriter pw;
-        public Handler() {
-        }
-        public Handler(BufferedReader br, PrintWriter pw) {
-            this.br = br;
-            this.pw = pw;
-        }
         @Override
         public void run() {
-            String name=null;
-            try {
-                while(true){
-                    String msg=br.readLine().trim();
-                    if(name==null && msg!=null){
-                        String[] strs=msg.split(":");
-                        if(strs!=null && strs.length>0){
-                            if(strs[0].equals("%username%")){
-                                name=strs[1];
-                                for(Map.Entry<String,PrintWriter> entry:pws.entrySet()){
-                                        pw.println("%name%is%exit%");
-                                        if(entry.getKey().equals(name)){
-                                        return;
-                                    }
-                                }
-                                System.out.println(name+"上线了！");
-                                pw.println("%login%success%");
-                                pws.put(name,pw);
+            handlerClient();
+        }
 
+        public void handlerClient(){
+            while(true){
+                try {
+                    String msg=br.readLine();
+                    if(msg!=null){
+                        String[] arr=msg.split(":");
+                        if(arr.length>0){
+                            String typeIdentifier=arr[0];
+                            if(typeIdentifier.equals(chatType.getLOGIN_NAME())){
+                                handlerLoginName(arr[1],pw);
+                            }else if(typeIdentifier.equals(chatType.getPRIVARE_CHAT())){
+                                handlerPrivateChat(arr,pw);
+                            }else if(typeIdentifier.equals(chatType.getPUBLIC_CHAT())){
+                                handlerPublicChat(arr,pw);
+                            }else if(msg.equals(chatType.getCONNECT_TEST())){
+                                pw.println(chatType.getCONNECT_SUCCESS());
                             }
                         }
-                    }else{
-                        System.out.println(name+":"+msg);
                     }
-
-
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
+            }
+        }
+
+        public void handlerLoginName(String loginName,PrintWriter pw){
+            for(Map.Entry<String,PrintWriter> entry:users.entrySet()){
+                if(entry.getKey().equals(loginName)){
+                    pw.println(chatType.getLOGIN_NAME_EXIT());
+                    return;
+                }
+            }
+            users.put(loginName,pw);
+            pw.println(chatType.getLOGIN_SUCCESS());
+        }
+
+        public void handlerPrivateChat(String[] arr,PrintWriter pw){
+            String str=assembleMsg(arr);
+            users.get(arr[0]).println(str);
+        }
+
+        public void handlerPublicChat(String[] arr,PrintWriter pw){
+            String str=assembleMsg(arr);
+            for (Map.Entry<String, PrintWriter> entry : users.entrySet()) {
+                entry.getValue().println(str);
+            }
+        }
+
+        public String assembleMsg(String[] arr){
+            String str="";
+            for(int i=1;i<arr.length;i++){
+                str=str+arr[i];
+            }
+            return str;
+        }
+
+
+    }
+
+    public class PublicParent{
+        BufferedReader br;
+        PrintWriter pw;
+        public PublicParent(Socket socket) {
+            try {
+                this.br = new BufferedReader(new InputStreamReader(socket.getInputStream(),"utf-8"));
+                this.pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),"utf-8"),true);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

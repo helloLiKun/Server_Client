@@ -6,27 +6,27 @@ import java.lang.reflect.Field;
  * Created by liKun on 2018/1/5 0005.
  */
 class ChatType {
+    private String CONNECT_TEST;
     private String CONNECT_SUCCESS;
     private String PRIVARE_CHAT;
     private String PUBLIC_CHAT;
     private String LOGIN_NAME;
-    private String LOGIN_PASSWORD;
-    private String LOGIN_SUCCESS;
     private String LOGIN_NAME_EXIT;
-    private String PASSWORD_ERROR;
+    private String LOGIN_SUCCESS;
     private String SEND_SUCCESS;
 
     public ChatType() {
     }
-    public static ChatType getChatType(){
-        ChatType chatType=new ChatType();
-        Class c=ChatType.class;
-        Field[] fields=c.getDeclaredFields();
-        if(fields!=null && fields.length>0){
-            for(Field f:fields){
+
+    public static ChatType getChatType() {
+        ChatType chatType = new ChatType();
+        Class c = ChatType.class;
+        Field[] fields = c.getDeclaredFields();
+        if (fields != null && fields.length > 0) {
+            for (Field f : fields) {
                 try {
                     f.setAccessible(true);
-                    f.set(chatType,"__@"+f.getName()+"__");
+                    f.set(chatType, "__@" + f.getName() + "__");
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -67,14 +67,6 @@ class ChatType {
         this.LOGIN_NAME = LOGIN_NAME;
     }
 
-    public String getLOGIN_PASSWORD() {
-        return LOGIN_PASSWORD;
-    }
-
-    public void setLOGIN_PASSWORD(String LOGIN_PASSWORD) {
-        this.LOGIN_PASSWORD = LOGIN_PASSWORD;
-    }
-
     public String getLOGIN_SUCCESS() {
         return LOGIN_SUCCESS;
     }
@@ -98,12 +90,11 @@ class ChatType {
     public void setLOGIN_NAME_EXIT(String LOGIN_NAME_EXIT) {
         this.LOGIN_NAME_EXIT = LOGIN_NAME_EXIT;
     }
-
-    public String getPASSWORD_ERROR() {
-        return PASSWORD_ERROR;
+    public String getCONNECT_TEST() {
+        return CONNECT_TEST;
     }
 
-    public void setPASSWORD_ERROR(String PASSWORD_ERROR) {
-        this.PASSWORD_ERROR = PASSWORD_ERROR;
+    public void setCONNECT_TEST(String CONNECT_TEST) {
+        this.CONNECT_TEST = CONNECT_TEST;
     }
 }
