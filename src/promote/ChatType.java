@@ -13,11 +13,13 @@ class ChatType {
     private String LOGIN_NAME;
     private String LOGIN_NAME_EXIT;
     private String LOGIN_SUCCESS;
-    private String SEND_SUCCESS;
+    private String EXITE_SYSTEM;
+    private String EXITE_SUCCESS;
 
     public ChatType() {
     }
 
+    //通过此静态方法对属性赋值“__@+属性名+__”
     public static ChatType getChatType() {
         ChatType chatType = new ChatType();
         Class c = ChatType.class;
@@ -75,14 +77,6 @@ class ChatType {
         this.LOGIN_SUCCESS = LOGIN_SUCCESS;
     }
 
-    public String getSEND_SUCCESS() {
-        return SEND_SUCCESS;
-    }
-
-    public void setSEND_SUCCESS(String SEND_SUCCESS) {
-        this.SEND_SUCCESS = SEND_SUCCESS;
-    }
-
     public String getLOGIN_NAME_EXIT() {
         return LOGIN_NAME_EXIT;
     }
@@ -96,5 +90,21 @@ class ChatType {
 
     public void setCONNECT_TEST(String CONNECT_TEST) {
         this.CONNECT_TEST = CONNECT_TEST;
+    }
+
+    public String getEXITE_SYSTEM() {
+        return EXITE_SYSTEM;
+    }
+
+    public void setEXITE_SYSTEM(String EXITE_SYSTEM) {
+        this.EXITE_SYSTEM = EXITE_SYSTEM;
+    }
+
+    public String getEXITE_SUCCESS() {
+        return EXITE_SUCCESS;
+    }
+
+    public void setEXITE_SUCCESS(String EXITE_SUCCESS) {
+        this.EXITE_SUCCESS = EXITE_SUCCESS;
     }
 }
